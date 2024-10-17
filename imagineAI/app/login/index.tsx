@@ -27,7 +27,7 @@ const LoginScreen = () => {
     try {
       const { createdSessionId, signIn, signUp, setActive } =
         await startOAuthFlow({
-          redirectUrl: Linking.createURL("/dashboard", { scheme: "myapp" }),
+          redirectUrl: Linking.createURL("(tabs)/home", { scheme: "myapp" }),
         });
 
       if (createdSessionId) {
