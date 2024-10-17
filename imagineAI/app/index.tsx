@@ -3,7 +3,7 @@ import { Redirect } from "expo-router";
 import { Text, View } from "react-native";
 
 export default function Index() {
-  const user = useUser();
+  const { user } = useUser();
   return (
     <View
       style={{
@@ -13,7 +13,11 @@ export default function Index() {
       }}
     >
       <Text>Edit test app/index.tsx to edit this screen.</Text>
-      {!user?<Redirect href={"/login"} />:<Redirect href={'/(tabs)/home'}></Redirect>}
+      {!user ? (
+        <Redirect href={"/login"} />
+      ) : (
+        <Redirect href={"/(tabs)/home"}></Redirect>
+      )}
     </View>
   );
 }

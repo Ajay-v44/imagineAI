@@ -1,5 +1,36 @@
 import type { Struct, Schema } from '@strapi/strapi';
 
+export interface ApiUserListUserList extends Struct.CollectionTypeSchema {
+  collectionName: 'user_lists';
+  info: {
+    singularName: 'user-list';
+    pluralName: 'user-lists';
+    displayName: 'UserList';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    userName: Schema.Attribute.String;
+    userEmail: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    credits: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<10>;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-list.user-list'
+    >;
+  };
+}
+
 export interface PluginUploadFile extends Struct.CollectionTypeSchema {
   collectionName: 'files';
   info: {
@@ -850,6 +881,7 @@ export interface AdminTransferTokenPermission
 declare module '@strapi/strapi' {
   export module Public {
     export interface ContentTypeSchemas {
+      'api::user-list.user-list': ApiUserListUserList;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::i18n.locale': PluginI18NLocale;
