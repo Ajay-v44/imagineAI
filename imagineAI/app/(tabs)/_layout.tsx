@@ -18,7 +18,7 @@ export default function TabLayout() {
       user?.primaryEmailAddress?.emailAddress
     );
     if (result.data.data.length != 0) {
-      setUserDetail(result.data.data);
+      setUserDetail(result.data.data[0]);
       return;
     }
     try {
@@ -27,7 +27,7 @@ export default function TabLayout() {
         userName: user?.fullName,
       };
       const response = await GlobalApi.CreateNewUser(data);
-      setUserDetail(response.data.data);
+      setUserDetail(response.data.data[0]);
     } catch (e) {
       console.log(JSON.stringify(e));
     }
