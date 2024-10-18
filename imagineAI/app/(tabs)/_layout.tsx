@@ -1,19 +1,36 @@
 import { View, Text } from "react-native";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Colors from "@/constants/Colors";
-import GetUerInfo from "@/services/GlobalApi";
+import GlobalApi from "@/services/GlobalApi";
 import { useUser } from "@clerk/clerk-expo";
+import CreateUser from "@/types/userTypes";
+import { UserDetailContext } from "@/context/userDetailContext";
 
 export default function TabLayout() {
   const { user } = useUser();
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const VerifyUser = async () => {
-    console.log("loading...")
-    const result = await GetUerInfo(user.emailAddresses[0].emailAddress);
-    console.log(result.data);
+    const result = await GlobalApi.GetUerInfo(
+      user?.primaryEmailAddress?.emailAddress
+    );
+    if (result.data.data.length != 0) {
+      setUserDetail(result.data.data);
+      return;
+    }
+    try {
+      const data: CreateUser = {
+        userEmail: user?.primaryEmailAddress?.emailAddress,
+        userName: user?.fullName,
+      };
+      const response = await GlobalApi.CreateNewUser(data);
+      setUserDetail(response.data.data);
+    } catch (e) {
+      console.log(JSON.stringify(e));
+    }
   };
 
   useEffect(() => {
