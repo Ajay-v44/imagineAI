@@ -1,9 +1,13 @@
 import { useUser } from "@clerk/clerk-expo";
 import { Redirect } from "expo-router";
 import { Text, View } from "react-native";
-
+import { useFonts } from 'expo-font';
 export default function Index() {
-  const user = useUser();
+  const [fontsLoaded] = useFonts({
+    ArimaBold: require('../assets/fonts/ArimaBold.ttf'), // Ensure the path is correct
+  });
+  
+  const { user } = useUser();
   return (
     <View
       style={{
@@ -13,7 +17,11 @@ export default function Index() {
       }}
     >
       <Text>Edit test app/index.tsx to edit this screen.</Text>
-      {!user?<Redirect href={"/login"} />:<Redirect href={'/(tabs)/home'}></Redirect>}
+      {!user ? (
+        <Redirect href={"/login"} />
+      ) : (
+        <Redirect href={"/(tabs)/home"}></Redirect>
+      )}
     </View>
   );
 }
