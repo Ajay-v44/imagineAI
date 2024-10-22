@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import Header from "@/components/Home/Header";
 import Banner from "@/components/Home/Banner";
+import FeaturedList from "@/components/Home/FeaturedList";
 
 const Home = () => {
   return (
@@ -10,6 +11,8 @@ const Home = () => {
       <Header />
       {/* Banner */}
       <Banner />
+      {/* FeaturedList */}
+      <FeaturedList />
     </View>
   );
 };

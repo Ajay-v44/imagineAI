@@ -27,6 +27,7 @@ export default function TabLayout() {
         userName: user?.fullName,
       };
       const response = await GlobalApi.CreateNewUser(data);
+      console.log(response)
       setUserDetail(response.data.data[0]);
     } catch (e) {
       console.log(JSON.stringify(e));

@@ -1,5 +1,41 @@
 import type { Struct, Schema } from '@strapi/strapi';
 
+export interface ApiAiModelAiModel extends Struct.CollectionTypeSchema {
+  collectionName: 'ai_models';
+  info: {
+    singularName: 'ai-model';
+    pluralName: 'ai-models';
+    displayName: 'aiModel';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    name: Schema.Attribute.String;
+    aiModelName: Schema.Attribute.Text;
+    defaultPrompt: Schema.Attribute.Text;
+    isFeatured: Schema.Attribute.Boolean;
+    userimageupload: Schema.Attribute.Boolean;
+    avatar: Schema.Attribute.Boolean;
+    icon: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    banner: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    style: Schema.Attribute.Boolean;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::ai-model.ai-model'
+    >;
+  };
+}
+
 export interface ApiUserListUserList extends Struct.CollectionTypeSchema {
   collectionName: 'user_lists';
   info: {
@@ -881,6 +917,7 @@ export interface AdminTransferTokenPermission
 declare module '@strapi/strapi' {
   export module Public {
     export interface ContentTypeSchemas {
+      'api::ai-model.ai-model': ApiAiModelAiModel;
       'api::user-list.user-list': ApiUserListUserList;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
