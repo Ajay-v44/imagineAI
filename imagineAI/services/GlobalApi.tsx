@@ -14,4 +14,11 @@ const CreateNewUser = (data: CreateUser) =>
   axiosClient.post("/user-lists", { data: data });
 const getFeatureCategoryList = () =>
   axiosClient.get("/ai-models?filters[isFeatured][$eq]=true&populate=*");
-export default { GetUerInfo, CreateNewUser, getFeatureCategoryList };
+const getAIModels = (type: string) =>
+  axiosClient.get("/ai-models?filters[" + type + "][$eq]=true&populate=*");
+export default {
+  GetUerInfo,
+  CreateNewUser,
+  getFeatureCategoryList,
+  getAIModels,
+};
