@@ -1,9 +1,11 @@
-import { View, Text, FlatList, Image } from "react-native";
+import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import GlobalApi from "@/services/GlobalApi";
 import Colors from "@/constants/Colors";
+import { useRouter } from "expo-router";
 
 const FeaturedList = () => {
+  const router = useRouter();
   const [aiModelList, setAiModelList] = useState<Array<string>>([]);
   useEffect(() => {
     getFeaturedList();
@@ -11,6 +13,12 @@ const FeaturedList = () => {
   const getFeaturedList = async () => {
     const result = await GlobalApi.getFeatureCategoryList();
     setAiModelList(result?.data?.data);
+  };
+  const handleOnClick = (item: any) => {
+    router.push({
+      pathname: "/formInput",
+      params: item,
+    });
   };
   return (
     <View style={{ marginTop: 25 }}>
@@ -25,9 +33,12 @@ const FeaturedList = () => {
       <FlatList
         data={aiModelList}
         numColumns={4}
-        style={{marginTop:7}}
+        style={{ marginTop: 7 }}
         renderItem={({ item, index }) => (
-          <View
+          <TouchableOpacity
+            onPress={() => {
+              handleOnClick(item);
+            }}
             style={{
               flex: 1,
               alignItems: "center",
@@ -58,7 +69,7 @@ const FeaturedList = () => {
             >
               {item?.name}
             </Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
     </View>

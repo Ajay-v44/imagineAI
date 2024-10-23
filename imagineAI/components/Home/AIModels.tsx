@@ -1,9 +1,11 @@
-import { View, Text, FlatList, Image } from "react-native";
+import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import GlobalApi from "@/services/GlobalApi";
 import Colors from "@/constants/Colors";
+import { useRouter } from "expo-router";
 
 const AIModels = ({ type }: any) => {
+  const router = useRouter();
   useEffect(() => {
     GetAIModels();
   }, []);
@@ -11,6 +13,12 @@ const AIModels = ({ type }: any) => {
   const GetAIModels = async () => {
     const result = await GlobalApi.getAIModels(type);
     setData(result?.data?.data);
+  };
+  const handleOnClick = (item: any) => {
+    router.push({
+      pathname: "/formInput",
+      params: item,
+    });
   };
   return (
     <View>
@@ -30,7 +38,10 @@ const AIModels = ({ type }: any) => {
         showsHorizontalScrollIndicator={false}
         nestedScrollEnabled={true}
         renderItem={({ item, index }) => (
-          <View
+          <TouchableOpacity
+            onPress={() => {
+              handleOnClick(item);
+            }}
             style={{
               marginRight: 15,
             }}
@@ -43,8 +54,20 @@ const AIModels = ({ type }: any) => {
                 borderRadius: 15,
               }}
             />
-            <Text  style={{position:"absolute",bottom:10,width:"100%",fontSize:15,color:Colors.WHITE,textAlign:'center',fontWeight:"medium"}} >{item?.name}</Text>
-          </View>
+            <Text
+              style={{
+                position: "absolute",
+                bottom: 10,
+                width: "100%",
+                fontSize: 15,
+                color: Colors.WHITE,
+                textAlign: "center",
+                fontWeight: "medium",
+              }}
+            >
+              {item?.name}
+            </Text>
+          </TouchableOpacity>
         )}
       />
     </View>
