@@ -1,8 +1,9 @@
 import { View, Text, TextInput } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import Colors from "@/constants/Colors";
 
-const TextInputComponent = () => {
+const TextInputComponent = ({userInputValue}) => {
+
   return (
     <View>
       <Text style={{ marginTop: 10 }}>Enter Your Prompt</Text>
@@ -12,6 +13,7 @@ const TextInputComponent = () => {
         numberOfLines={5}
         multiline={true}
         textAlignVertical="top"
+        onChangeText={userInputValue}
         style={{
           padding: 15,
           backgroundColor: Colors.LIGHT_GRAY,
