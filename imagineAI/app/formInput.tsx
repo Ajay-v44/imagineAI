@@ -4,13 +4,14 @@ import { useLocalSearchParams, useNavigation } from "expo-router";
 import Colors from "@/constants/Colors";
 import TextInputComponent from "@/components/FormInput/TextInput";
 import ImageInput from "@/components/FormInput/ImageInput";
+import GlobalApi from "@/services/GlobalApi";
 
 const FormInput = () => {
   const params = useLocalSearchParams();
   const navigation = useNavigation();
   const [aiModel, setAiModel] = useState<Array<string>>();
   const [userInput, setUserInput] = useState<string>();
-  const [imageInput,setImageInput]=useState<string>()
+  const [imageInput, setImageInput] = useState<string>();
   useEffect(() => {
     setAiModel(params);
     navigation.setOptions({
@@ -18,8 +19,12 @@ const FormInput = () => {
       headerTitle: params.name,
     });
   }, []);
+  async function callAPI(data: any) {
+    const result = await GlobalApi.getAIModels(data);
+    console.log(result);
+  }
 
-  const onGenerate = async () => {
+  const onGenerate = () => {
     try {
       Alert.alert("Generate", "Generate Image", [
         {
@@ -27,9 +32,19 @@ const FormInput = () => {
           onPress: () => console.log("Cancel Pressed"),
           style: "cancel",
         },
-        { text: "OK", onPress: () => {
-          console.log(imageInput)
-        }},
+        {
+          text: "OK",
+          onPress: () => {
+            if (userInput) {
+              const data: any = {
+                aiModelName: aiModel?.aiModelName,
+                inputPrompt: userInput,
+                defaultPrompt: aiModel?.defaultPrompt,
+              };
+              callAPI(data);
+            }
+          },
+        },
       ]);
     } catch (err) {
       console.log(err);
