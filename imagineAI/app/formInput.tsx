@@ -1,10 +1,18 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import React, { useContext, useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import Colors from "@/constants/Colors";
 import TextInputComponent from "@/components/FormInput/TextInput";
 import ImageInput from "@/components/FormInput/ImageInput";
 import GlobalApi from "@/services/GlobalApi";
+import { UserDetailContext } from "@/context/userDetailContext";
 
 const FormInput = () => {
   const params = useLocalSearchParams();
@@ -12,6 +20,9 @@ const FormInput = () => {
   const [aiModel, setAiModel] = useState<Array<string>>();
   const [userInput, setUserInput] = useState<string>();
   const [imageInput, setImageInput] = useState<string>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [generatedImage, setgeneratedImage] = useState<string>();
+  const { userDetail, setUserDetail } = useContext<any>(UserDetailContext);
   useEffect(() => {
     setAiModel(params);
     navigation.setOptions({
@@ -20,10 +31,14 @@ const FormInput = () => {
     });
   }, []);
   async function callAPI(data: any) {
-    const result = await GlobalApi.getAIModels(data);
-    console.log(result);
+    const result = await GlobalApi.generateAIImages(data);
+    const credits = await GlobalApi.UpdateUserCredits(userDetail?.documentId, {
+      credits: Number(userDetail?.credits) - 1,
+    });
+    setUserDetail(credits?.data?.data);
+    setLoading(false);
+    return;
   }
-
   const onGenerate = () => {
     try {
       Alert.alert("Generate", "Generate Image", [
@@ -36,6 +51,7 @@ const FormInput = () => {
           text: "OK",
           onPress: () => {
             if (userInput) {
+              setLoading(true);
               const data: any = {
                 aiModelName: aiModel?.aiModelName,
                 inputPrompt: userInput,
@@ -70,6 +86,7 @@ const FormInput = () => {
         </Text>
         <TouchableOpacity
           onPress={onGenerate}
+          disabled={loading}
           style={{
             padding: 15,
             backgroundColor: Colors.PRIMARY,
@@ -81,7 +98,7 @@ const FormInput = () => {
           <Text
             style={{ color: Colors.WHITE, textAlign: "center", fontSize: 15 }}
           >
-            Generate
+            {loading ? <ActivityIndicator /> : "Generate"}
           </Text>
         </TouchableOpacity>
       </View>
