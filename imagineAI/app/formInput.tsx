@@ -31,11 +31,19 @@ const FormInput = () => {
     });
   }, []);
   async function callAPI(data: any) {
-    const result = await GlobalApi.generateAIImages(data);
+    const result:any = await GlobalApi.generateAIImages(data);
     const credits = await GlobalApi.UpdateUserCredits(userDetail?.documentId, {
       credits: Number(userDetail?.credits) - 1,
     });
     setUserDetail(credits?.data?.data);
+
+    // save result
+    const Input={
+      imageUrl:result?.data?.data,
+      userEmail:userDetail?.userEmail
+    }
+    const saveInput=await GlobalApi.CreateRecord(Input)
+    console.log(saveInput.data.data)
     setLoading(false);
     return;
   }
@@ -64,6 +72,7 @@ const FormInput = () => {
       ]);
     } catch (err) {
       console.log(err);
+      setLoading(!loading)
     }
   };
   return (
