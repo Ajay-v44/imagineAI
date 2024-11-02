@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import Colors from "@/constants/Colors";
 import TextInputComponent from "@/components/FormInput/TextInput";
 import ImageInput from "@/components/FormInput/ImageInput";
@@ -15,6 +15,7 @@ import GlobalApi from "@/services/GlobalApi";
 import { UserDetailContext } from "@/context/userDetailContext";
 
 const FormInput = () => {
+  const router = useRouter();
   const params = useLocalSearchParams();
   const navigation = useNavigation();
   const [aiModel, setAiModel] = useState<Array<string>>();
@@ -31,21 +32,27 @@ const FormInput = () => {
     });
   }, []);
   async function callAPI(data: any) {
-    const result:any = await GlobalApi.generateAIImages(data);
-    const credits = await GlobalApi.UpdateUserCredits(userDetail?.documentId, {
-      credits: Number(userDetail?.credits) - 1,
-    });
-    setUserDetail(credits?.data?.data);
+    // const result: any = await GlobalApi.generateAIImages(data);
+    const imageUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/1960%27s_art_of_cow_getting_abducted_by_UFO_in_midwest.jpg/800px-1960%27s_art_of_cow_getting_abducted_by_UFO_in_midwest.jpg"
+    // const credits = await GlobalApi.UpdateUserCredits(userDetail?.documentId, {
+    //   credits: Number(userDetail?.credits) - 1,
+    // });
+    // setUserDetail(credits?.data?.data);
 
     // save result
-    const Input={
-      imageUrl:result?.data?.data,
-      userEmail:userDetail?.userEmail
-    }
-    const saveInput=await GlobalApi.CreateRecord(Input)
-    console.log(saveInput.data.data)
+    const Input = {
+      imageUrl: imageUrl,
+      userEmail: userDetail?.userEmail,
+    };
+    // const saveInput = await GlobalApi.CreateRecord(Input);
     setLoading(false);
-    return;
+    router.push({
+      pathname: "/viewAiImage",
+      params: {
+        imageUrl: imageUrl,
+        prompt: userInput,
+      },
+    });
   }
   const onGenerate = () => {
     try {
@@ -72,7 +79,7 @@ const FormInput = () => {
       ]);
     } catch (err) {
       console.log(err);
-      setLoading(!loading)
+      setLoading(false);
     }
   };
   return (
