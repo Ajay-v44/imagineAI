@@ -35,20 +35,20 @@ const FormInput = () => {
     });
   }, []);
   async function textToImage(data: any) {
-    const result: any = await GlobalApi.generateAIImages(data);
+    // const result: any = await GlobalApi.generateAIImages(data);
     const imageUrl =
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/1960%27s_art_of_cow_getting_abducted_by_UFO_in_midwest.jpg/800px-1960%27s_art_of_cow_getting_abducted_by_UFO_in_midwest.jpg";
-    const credits = await GlobalApi.UpdateUserCredits(userDetail?.documentId, {
-      credits: Number(userDetail?.credits) - 1,
-    });
-    setUserDetail(credits?.data?.data);
+    // const credits = await GlobalApi.UpdateUserCredits(userDetail?.documentId, {
+    //   credits: Number(userDetail?.credits) - 1,
+    // });
+    // setUserDetail(credits?.data?.data);
 
     // save result
     const Input = {
       imageUrl: imageUrl,
       userEmail: userDetail?.userEmail,
     };
-    const saveInput = await GlobalApi.CreateRecord(Input);
+    // const saveInput = await GlobalApi.CreateRecord(Input);
     setLoading(false);
     router.push({
       pathname: "/viewAiImage",

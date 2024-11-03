@@ -22,6 +22,7 @@ const UpdateUserCredits = (documentId, data) =>
   axiosClient.put("/user-lists/" + documentId, { data: data });
 const CreateRecord = (data) =>
   axios.post("/ai-generated-images", { data: data });
+const GetAllAiImages = (pagesize: number) => axiosClient.get(`/ai-generated-images?pagination[start]=${pagesize-5}&pagination[limit]=${pagesize}`)
 export default {
   GetUerInfo,
   CreateNewUser,
@@ -30,4 +31,5 @@ export default {
   generateAIImages,
   UpdateUserCredits,
   CreateRecord,
+  GetAllAiImages
 };
