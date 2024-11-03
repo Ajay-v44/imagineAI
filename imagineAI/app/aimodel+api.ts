@@ -10,6 +10,8 @@ export async function POST(request: Request) {
     const output: any = await replicate.run(data?.aiModelName, {
       input: {
         prompt: data?.inputPrompt + "" + data?.defaultPrompt,
+        main_face_image:data?.userImageUrl,
+        image:data?.userImageUrl
       },
     });
     console.log(output);

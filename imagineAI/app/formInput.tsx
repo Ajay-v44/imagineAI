@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  ToastAndroid,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
@@ -13,6 +14,8 @@ import TextInputComponent from "@/components/FormInput/TextInput";
 import ImageInput from "@/components/FormInput/ImageInput";
 import GlobalApi from "@/services/GlobalApi";
 import { UserDetailContext } from "@/context/userDetailContext";
+import { Cloudinary } from "@cloudinary/url-gen";
+import { upload } from "cloudinary-react-native";
 
 const FormInput = () => {
   const router = useRouter();
@@ -31,20 +34,21 @@ const FormInput = () => {
       headerTitle: params.name,
     });
   }, []);
-  async function callAPI(data: any) {
-    // const result: any = await GlobalApi.generateAIImages(data);
-    const imageUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/1960%27s_art_of_cow_getting_abducted_by_UFO_in_midwest.jpg/800px-1960%27s_art_of_cow_getting_abducted_by_UFO_in_midwest.jpg"
-    // const credits = await GlobalApi.UpdateUserCredits(userDetail?.documentId, {
-    //   credits: Number(userDetail?.credits) - 1,
-    // });
-    // setUserDetail(credits?.data?.data);
+  async function textToImage(data: any) {
+    const result: any = await GlobalApi.generateAIImages(data);
+    const imageUrl =
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/1960%27s_art_of_cow_getting_abducted_by_UFO_in_midwest.jpg/800px-1960%27s_art_of_cow_getting_abducted_by_UFO_in_midwest.jpg";
+    const credits = await GlobalApi.UpdateUserCredits(userDetail?.documentId, {
+      credits: Number(userDetail?.credits) - 1,
+    });
+    setUserDetail(credits?.data?.data);
 
     // save result
     const Input = {
       imageUrl: imageUrl,
       userEmail: userDetail?.userEmail,
     };
-    // const saveInput = await GlobalApi.CreateRecord(Input);
+    const saveInput = await GlobalApi.CreateRecord(Input);
     setLoading(false);
     router.push({
       pathname: "/viewAiImage",
@@ -55,6 +59,10 @@ const FormInput = () => {
     });
   }
   const onGenerate = () => {
+    if (userDetail.credits<=0){
+      ToastAndroid.show('You Dont Have Enough Credits. ',ToastAndroid.LONG)
+      return 
+    }
     try {
       Alert.alert("Generate", "Generate Image", [
         {
@@ -72,7 +80,10 @@ const FormInput = () => {
                 inputPrompt: userInput,
                 defaultPrompt: aiModel?.defaultPrompt,
               };
-              callAPI(data);
+              textToImage(data);
+            } else if (aiModel.userimageupload === "true") {
+              setLoading(true);
+              imageToAiImage();
             }
           },
         },
@@ -82,10 +93,51 @@ const FormInput = () => {
       setLoading(false);
     }
   };
+
+  const imageToAiImage = async () => {
+    const cld = new Cloudinary({
+      cloud: {
+        cloudName: `${process.env.EXPO_PUBLIC_CLOUDINARY_NAME}`,
+      },
+      url: {
+        secure: true,
+      },
+    });
+
+    const options = {
+      upload_preset: `${process.env.EXPO_PUBLIC_UPLOAD_PRESET_NAME}`,
+      unsigned: true,
+    };
+
+    await upload(cld, {
+      file: imageInput,
+      options: options,
+      callback: async (error: any, response: any) => {
+        //.. handle response
+        if (error !== undefined) {
+          alert(error)
+        }
+        const data = {
+          prompt: aiModel?.defaultPrompt,
+          userImageUrl: response?.url,
+          aiModelName: aiModel?.aiModelName
+        }
+        const result = await GlobalApi.generateAIImages(data)
+        console.log("result", result)
+        router.push({
+          pathname: "/viewAiImage",
+          params: {
+            imageUrl: result?.data?.result,
+            prompt: aiModel?.name,
+          },
+        });
+        setLoading(false);
+      },
+    });
+  };
   return (
     <View style={styles.constiner}>
       <Text style={styles.headingText}>{aiModel?.name}</Text>
-
       <View>
         {aiModel?.userimageupload === "true" ? (
           <ImageInput setImage={setImageInput} />
